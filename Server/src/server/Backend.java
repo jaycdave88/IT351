@@ -5,17 +5,14 @@
  */
 package server;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -44,28 +41,18 @@ public class Backend {
                 InputStreamReader reader = new InputStreamReader(in);
 
                 String client_response = convertInputStreamToString(reader);
-                
+
                 ServerCommunicationHelper sch = new ServerCommunicationHelper();
                 sch.unpackageFields(client_response);
-                for (Map.Entry<String, String> entry : sch.dictionary.entrySet()) {
-                    String key = entry.getKey();
-                    String value = entry.getValue();
-                    
-                    System.out.println(key);
-                    System.out.println(value);
-                }
+                String file_path = (sch.dictionary.get("destination") + ".txt");
+                writeDataToFile(sch.dictionary.get("content"), file_path);
+            }
 
-                    writeDataToFile(sch.dictionary.get("content"), "./"+sch.dictionary.get("destination") + ".txt");
-
-                }
-
-            }catch (IOException ex) {
+        } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
 
-        }
-
-    
+    }
 
     private static String convertInputStreamToString(InputStreamReader reader) throws IOException {
 
@@ -78,15 +65,18 @@ public class Backend {
     }
 
     private static void writeDataToFile(String client_response, String fileName) throws IOException {
-        FileOutputStream outputStream = new FileOutputStream(fileName);
-        byte[] strToBytes = client_response.getBytes();
         try {
-            outputStream.write(strToBytes);
-        } catch (IOException ex) {
-            Logger.getLogger(Backend.class.getName()).log(Level.SEVERE, null, ex);
+            File file = new File("../"+ fileName);
+            FileWriter writer = new FileWriter(file, true);
+            BufferedWriter bwr = new BufferedWriter(writer);
+            bwr.write(client_response);
+            bwr.write("\n");
+            bwr.close();
+            System.out.println("succesfully written to a file");
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
         }
 
-        outputStream.close();
     }
 
 }

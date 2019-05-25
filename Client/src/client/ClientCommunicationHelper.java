@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class ClientCommunicationHelper {
 
-    private Map<String, String> dictionary;
+    public Map<String, String> dictionary;
 
     public ClientCommunicationHelper() {
         dictionary = new HashMap<String, String>();
