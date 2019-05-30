@@ -39,9 +39,9 @@ public class ClientCommunicationHelper {
             sb.append(value.length());
             sb.append("|");
             sb.append(value);
-            
+            sb.append("|");
+
         }
         return sb.toString();
     }
-
 }
