@@ -25,70 +25,68 @@ public class ServerCommunicationHelper {
         return this.dictionary.get(fieldName);
     }
 
-public void unpackageFields(String packedFields) {
-       StringBuilder builder = new StringBuilder();
+    public void unpackageFields(String packedFields) {
+        StringBuilder builder = new StringBuilder();
 
-       String fieldName = null;
-       char fieldNameFirstChar = 'c';
-       boolean inFieldCount = true;
-       boolean inFieldName = false;
-       boolean inFieldLength = false;
-       int fieldCount = 0;
-       int fieldLength = 0;
-       int valueIndex = 0;
-       int globalIndex = 0;
+        String fieldName = null;
+        char fieldNameFirstChar = 'c';
+        boolean inFieldCount = true;
+        boolean inFieldName = false;
+        boolean inFieldLength = false;
+        int fieldCount = 0;
+        int fieldLength = 0;
+        int valueIndex = 0;
+        int globalIndex = 0;
 
-       while (globalIndex < packedFields.length()) {
-           char c = packedFields.charAt(globalIndex++);
+        while (globalIndex < packedFields.length()) {
+            char c = packedFields.charAt(globalIndex++);
 
-           if (inFieldCount) {
-               if (c == '|') {
-                   fieldCount = Integer.parseInt(builder.toString());
-                   builder = new StringBuilder();
-                   inFieldCount = false;
-                   inFieldName = true;
-               } else {
-                   builder.append(c);
-               }
-           }
-           else {
-               if (inFieldName) {
-                   if (c == '|') {
-                       fieldName = builder.toString();
-                       builder = new StringBuilder();
-                       inFieldName = false;
-                       inFieldLength = true;
-                   } else {
-                       builder.append(c);
-                   }
-               } else {
-                   if (inFieldLength) {
-                       if (c == '|') {
-                           fieldLength = Integer.parseInt(builder.toString());
-                           builder = new StringBuilder();
-                           valueIndex = 0;
-                           inFieldLength = false;
-                       } else {
-                           builder.append(c);
-                       }
-                   } else {
-                       valueIndex++;
-                       if (valueIndex <= fieldLength) {
-                           builder.append(c);
-                           //valueIndex++;
-                       } else {
-                           
-                           
-                           String value = builder.toString();
-                           dictionary.put(fieldName, value);
-                           builder = new StringBuilder();
-                           builder.append(c);
+            if (inFieldCount) {
+                if (c == '|') {
+                    fieldCount = Integer.parseInt(builder.toString());
+                    builder = new StringBuilder();
+                    inFieldCount = false;
+                    inFieldName = true;
+                } else {
+                    builder.append(c);
+                }
+            } else {
+                if (inFieldName) {
+                    if (c == '|') {
+                        fieldName = builder.toString();
+                        builder = new StringBuilder();
+                        inFieldName = false;
+                        inFieldLength = true;
+                    } else {
+                        builder.append(c);
+                    }
+                } else {
+                    if (inFieldLength) {
+                        if (c == '|') {
+                            fieldLength = Integer.parseInt(builder.toString());
+                            builder = new StringBuilder();
+                            valueIndex = 0;
+                            inFieldLength = false;
+                        } else {
+                            builder.append(c);
+                        }
+                    } else {
+                        valueIndex++;
+                        if (valueIndex <= fieldLength) {
+                            builder.append(c);
+                            //valueIndex++;
+                        } else {
 
-                           inFieldName = true;
-                       }
-                   }
-               }
-           }
-       }
-   }
+                            String value = builder.toString();
+                            dictionary.put(fieldName, value);
+                            builder = new StringBuilder();
+                            builder.append(c);
+
+                            inFieldName = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

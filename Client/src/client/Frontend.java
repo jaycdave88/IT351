@@ -71,6 +71,11 @@ public class Frontend extends javax.swing.JFrame {
         label.setText("Output");
 
         readRadioBtn.setText("Read");
+        readRadioBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                readRadioBtnActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -126,31 +131,39 @@ public class Frontend extends javax.swing.JFrame {
         getSocketPrintWriter("customer", isRead);
     }//GEN-LAST:event_customerBtnActionPerformed
 
+    private void readRadioBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_readRadioBtnActionPerformed
+        if (readRadioBtn.isSelected()) {
+            outputArea.setEnabled(false);
+        } else {
+            outputArea.setEnabled(true);
+        }
+        outputArea.setText("");
+    }//GEN-LAST:event_readRadioBtnActionPerformed
+
     private PrintWriter getSocketPrintWriter(String destination, boolean isRead) {
         PrintWriter writer = null;
         try {
             Socket socket = new Socket("127.0.0.1", 4444);
+
             OutputStream output = socket.getOutputStream();
+
             writer = new PrintWriter(output, true);
             ClientCommunicationHelper cch = new ClientCommunicationHelper();
 
             cch.addField("destination", destination);
             cch.addField("content", outputArea.getText());
+            cch.addField("opperation", Boolean.toString(isRead));
+
+            String packaged = cch.packageFields();
+            writer.println(packaged);
 
             if (isRead) {
-                if (cch.dictionary.get("destination").equals("customer")) {
-                    destination = "../customer.txt";
-                } else {
-                    destination = "../product.txt";
-                }
-                readFile(destination);
+                destinationPicker(cch);
+                readStream(socket);
             } else {
-                String packaged = cch.packageFields();
-                writer.println(packaged);
                 outputArea.setText("");
+                socket.close();
             }
-
-            socket.close();
 
         } catch (IOException ex) {
             Logger.getLogger(Frontend.class.getName()).log(Level.SEVERE, null, ex);
@@ -158,14 +171,25 @@ public class Frontend extends javax.swing.JFrame {
         return writer;
     }
 
-    private void readFile(String destination) throws FileNotFoundException, IOException {
-        FileReader reader = new FileReader(destination); //create reader
-        BufferedReader br = new BufferedReader(reader); //buffered reader to read line of text
+    private void destinationPicker(ClientCommunicationHelper cch) {
+        String destination;
+        if (cch.dictionary.get("destination").equals("customer")) {
+            destination = "../customer.txt";
+        } else {
+            destination = "../product.txt";
+        }
+    }
 
-        String line = br.readLine(); //read line of text
-        while (line != null) { //if line is not empty
-            outputArea.append(line + "\n");
-            line = br.readLine(); //read next line
+    private void readStream(Socket socket) {
+        try {
+            InputStream inFromServer = socket.getInputStream();
+            DataInputStream in = new DataInputStream(inFromServer);
+            String test = in.readUTF();
+            outputArea.append(test);
+
+            socket.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Frontend.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
