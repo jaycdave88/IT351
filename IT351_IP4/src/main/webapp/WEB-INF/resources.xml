@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+  <Resource id="Connect_here" type="javax.sql.DataSource">#Fri Jun 14 23:14:38 CDT 2019
+jdbcDriver=com.mysql.jdbc.Driver
+password=admin
+userName=root
+jdbcUrl=jdbc\:mysql\://localhost\:3306/IT351_IP4?zeroDateTimeBehavior\=convertToNull
+</Resource>
+</resources>
